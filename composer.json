@@ -3,7 +3,6 @@
     "description": "Fullcalendar integration for Wordpress Events Manager",
     "type": "wordpress-plugin",
     "license": "MIT",
-    "version": "0.1.0",
     "authors": [
         {
             "name": "Daniel Ma",
