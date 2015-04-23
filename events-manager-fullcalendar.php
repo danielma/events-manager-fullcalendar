@@ -30,19 +30,62 @@ class EMFullCalendarEvent {
   }
 
   public function get_posts($filter = array(), $context = 'view', $type = 'event', $page = 1) {
-    $query = array();
+    $query = [];
 
-    $event_list  = EM_Events::get(['limit' => 16, 'scope' => [$filter['start'], $filter['end']]]);
-    $response    = new WP_JSON_Response();
+    $post_list = EM_Events::get(['limit' => 16, 'scope' => [$filter['start'], $filter['end']]]);
+    $response  = new WP_JSON_Response();
 
-    if (!$event_list) {
+    if (!$post_list) {
       $response->set_data([]);
       return $response;
     }
 
-    $response->set_data($event_list);
+    $post_list = array_map([$this, 'prepare_post'], $post_list);
+
+    $response->set_data($post_list);
 
     return $response;
   }
-}
 
+  /*
+   * transform an EM_Event object into a Fullcalendar event object
+   * Reference: http://fullcalendar.io/docs/event_data/Event_Object/
+   */
+  private function prepare_post($post) {
+    $id = empty($post->recurrence_id) ? $post->event_id : $post->recurrence_id;
+    $id = intval($id);
+
+    $all_day = !!$post->event_all_day;
+
+    $end_unix = $post->end;
+    if ($all_day) {
+      $end_unix = strtotime('+1 day', $post->end);
+    }
+
+    $start = date(\DateTime::ISO8601, $post->start);
+    $end = date(\DateTime::ISO8601, $end_unix);
+
+    $categories = array_map(function($cat) {
+      return $cat->name;
+    }, array_values($post->get_categories()->categories));
+
+    $description = empty($post->post_excerpt) ? $post->post_content : $post->post_excerpt;
+    $description = strip_tags($description);
+
+    $newPost = [
+      // Official properties
+      'id'          => $id,
+      'title'       => $post->event_name,
+      'allDay'      => $all_day,
+      'start'       => $start,
+      'end'         => $end,
+      'url'         => $post->get_permalink(),
+
+      // extra properties
+      'categories'  => $categories,
+      'description' => $description
+    ];
+
+    return $newPost;
+  }
+}
