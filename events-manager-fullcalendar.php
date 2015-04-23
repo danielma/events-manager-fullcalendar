@@ -32,7 +32,7 @@ class EMFullCalendarEvent {
   public function get_posts($filter = array(), $context = 'view', $type = 'event', $page = 1) {
     $query = [];
 
-    $post_list = EM_Events::get(['limit' => 16, 'scope' => [$filter['start'], $filter['end']]]);
+    $post_list = EM_Events::get(['scope' => [$filter['start'], $filter['end']]]);
     $response  = new WP_JSON_Response();
 
     if (!$post_list) {
