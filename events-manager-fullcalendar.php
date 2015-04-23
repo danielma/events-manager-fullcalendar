@@ -62,12 +62,10 @@ class EMFullCalendarEvent {
       $end_unix = strtotime('+1 day', $post->end);
     }
 
+    $category = $this->get_category($post);
+
     $start = date(\DateTime::ISO8601, $post->start);
     $end = date(\DateTime::ISO8601, $end_unix);
-
-    $categories = array_map(function($cat) {
-      return $cat->name;
-    }, array_values($post->get_categories()->categories));
 
     $description = empty($post->post_excerpt) ? $post->post_content : $post->post_excerpt;
     $description = strip_tags($description);
@@ -80,12 +78,31 @@ class EMFullCalendarEvent {
       'start'       => $start,
       'end'         => $end,
       'url'         => $post->get_permalink(),
+      'color'       => $category['color'],
 
       // extra properties
-      'categories'  => $categories,
+      'category'    => $category['name'],
       'description' => $description
     ];
 
     return $newPost;
+  }
+
+  private function get_category($post) {
+    $categories = array_values($post->get_categories()->categories);
+
+    if (empty($categories)) {
+      return [
+        'name'  => null,
+        'color' => null
+      ];
+    }
+
+    $category = $categories[0];
+
+    return [
+      'name'  => $category->name,
+      'color' => $category->get_color()
+    ];
   }
 }
