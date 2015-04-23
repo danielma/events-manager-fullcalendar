@@ -1,0 +1,11 @@
+{
+    "name": "danielma/events-manager-fullcalendar",
+    "description": "Fullcalendar integration for Wordpress Events Manager",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Ma",
+            "email": "drailskid@yahoo.com"
+        }
+    ]
+}
