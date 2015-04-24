@@ -81,7 +81,7 @@ class EMFullCalendarEvent {
       'color'       => $category['color'],
 
       // extra properties
-      'category'    => $category['name'],
+      'category'    => $category['id'],
       'description' => $description
     ];
 
@@ -93,6 +93,7 @@ class EMFullCalendarEvent {
 
     if (empty($categories)) {
       return [
+        'id'    => null,
         'name'  => null,
         'color' => null
       ];
@@ -101,6 +102,7 @@ class EMFullCalendarEvent {
     $category = $categories[0];
 
     return [
+      'id'    => $category->id,
       'name'  => $category->name,
       'color' => $category->get_color()
     ];
