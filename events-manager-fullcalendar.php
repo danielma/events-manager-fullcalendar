@@ -23,10 +23,19 @@ class EMFullCalendarEvent {
       [[$this, 'get_posts'], WP_JSON_Server::READABLE]
     ];
     $routes['/events-manager/events/(?P<id>\d+)'] = [
-      [[ $this, 'get_posts'], WP_JSON_Server::READABLE]
+      [[ $this, 'get_post'], WP_JSON_Server::READABLE]
     ];
 
     return $routes;
+  }
+
+  public function get_post($id, $context = 'view') {
+    $event = em_get_event($id);
+
+    $response = new WP_JSON_Response();
+    $response->set_data($this->prepare_post($event));
+
+    return $response;
   }
 
   public function get_posts($filter = array(), $context = 'view', $type = 'event', $page = 1) {
