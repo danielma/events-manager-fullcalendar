@@ -41,7 +41,9 @@ class EMFullCalendarEvent {
     $event = em_get_event($id);
 
     $response = new \WP_JSON_Response();
-    $response->set_data($this->prepare_post($event, ['include_image' => true]));
+    $response->set_data($this->prepare_post($event,
+      ['include_image' => true, 'include_location' => true]
+    ));
 
     return $response;
   }
@@ -79,7 +81,8 @@ class EMFullCalendarEvent {
     $recurrence_id = $recurrence_id > 0 ? $recurrence_id : null;
 
     $options = option_defaults([
-      'include_image' => false
+      'include_image'    => false,
+      'include_location' => false
     ], $options);
 
     $all_day = !!$post->event_all_day;
@@ -118,7 +121,31 @@ class EMFullCalendarEvent {
       $newPost['featured_image'] = all_image_urls($thumbnail_id);
     }
 
+    if ($options['include_location']) {
+      $newPost['location'] = $this->get_location($post);
+    }
+
     return $newPost;
+  }
+
+  private function get_location($post) {
+    $location = em_get_location($post->location_id);
+
+    if ($location->location_id === '') { return null; }
+
+    $newLocation = [
+      'id'   => intval($location->location_id),
+      'city' => $location->location_town
+    ];
+
+    $attrs = ['name', 'address', 'state', 'postcode', 'region', 'country', 'latitude', 'longitude'];
+
+    foreach ($attrs as $attr) {
+      $attr_name = 'location_' . $attr;
+      $newLocation[$attr] = $location->$attr_name;
+    }
+
+    return $newLocation;
   }
 
   private function get_category($post) {
