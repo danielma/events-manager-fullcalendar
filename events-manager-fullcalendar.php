@@ -66,8 +66,9 @@ class EMFullCalendarEvent {
    * Reference: http://fullcalendar.io/docs/event_data/Event_Object/
    */
   private function prepare_post($post) {
-    $id = empty($post->recurrence_id) ? $post->event_id : $post->recurrence_id;
-    $id = intval($id);
+    $id = intval($post->event_id);
+    $recurrence_id = intval($post->recurrence_id);
+    $recurrence_id = $recurrence_id > 0 ? $recurrence_id : null;
 
     $all_day = !!$post->event_all_day;
 
@@ -86,17 +87,18 @@ class EMFullCalendarEvent {
 
     $newPost = [
       // Official properties
-      'id'          => $id,
-      'title'       => $post->event_name,
-      'allDay'      => $all_day,
-      'start'       => $start,
-      'end'         => $end,
-      'url'         => $post->get_permalink(),
-      'color'       => $category['color'],
+      'id'            => $id,
+      'recurrence_id' => $recurrence_id,
+      'title'         => $post->event_name,
+      'allDay'        => $all_day,
+      'start'         => $start,
+      'end'           => $end,
+      'url'           => $post->get_permalink(),
+      'color'         => $category['color'],
 
       // extra properties
-      'category'    => $category['id'],
-      'description' => $description
+      'category'      => $category['id'],
+      'description'   => $description
     ];
 
     return $newPost;
