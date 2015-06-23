@@ -4,6 +4,9 @@ namespace EMFullCalendar;
 
 function all_image_urls($attachment_id) {
   $original_url = wp_get_attachment_image_src($attachment_id);
+
+  if ($original_url === false) { return null; }
+
   $image_data   = wp_get_attachment_metadata($attachment_id);
 
   preg_match("/.+\//", $original_url[0], $matches);
