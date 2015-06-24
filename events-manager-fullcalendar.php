@@ -53,10 +53,20 @@ class EMFullCalendarEvent {
 
     $start = isset($filter['start']) ? $filter['start'] : null;
     $end   = isset($filter['end'])   ? $filter['end']   : null;
+    $tag   = isset($filter['tag'])   ? new \EM_Tag($filter['tag']) : null;
     $limit = isset($filter['limit']) ? $filter['limit'] :
       (!(is_null($start) || is_null($end)) ? 0 : 100);
 
-    $post_list = \EM_Events::get(['scope' => [$start, $end], 'limit' => $limit]);
+    $events_query = [
+      'scope' => [$start, $end],
+      'limit' => $limit
+    ];
+
+    if (!is_null($tag)) {
+      $events_query['tag'] = $tag->term_id;
+    }
+
+    $post_list = \EM_Events::get($events_query);
     $response  = new \WP_JSON_Response();
 
     if (!$post_list) {
